@@ -1,0 +1,2 @@
+image: google/cadvisor:v0.38.8
+hostPort: 8080
