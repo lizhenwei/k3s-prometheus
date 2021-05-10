@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: process-exporter
+  name: process-exporter
+spec:
+  selector:
+    matchLabels:
+      app: process-exporter
+  template:
+    metadata:
+      labels:
+        app: process-exporter  
+    spec:
+      hostNetwork: true
+      hostPID: true
+      hostIPC: true
+      containers:
+      - image: ncabatoff/process-exporter:0.7.5
+        args:
+        - "-procfs=/host/proc"
+        - "-config.path=/etc/process-exporter/process-exporter.yaml"
+        name: process-exporter
+        ports:
+        - name: http
+          containerPort: 9256
+          hostPort: 9256
+        resources:
+          requests:
+            memory: 50Mi
+            cpu: 256m
+          limits:
+            memory: 200Mi
+            cpu: 512m
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/process-exporter
+        - name: proc
+          readOnly:  true
+          mountPath: /host/proc
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: config-volume
+          configMap:
+            name: process-config

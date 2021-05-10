@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: process-config
+data:
+  process-exporter.yaml: |
+    process_names:
+      - name: "{{.Comm}}"
+        cmdline:
+        - '.+'
